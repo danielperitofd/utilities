@@ -120,7 +120,7 @@
                         <!-- CARD DA GALERIA COM ANIMAÇÃO -->
                         <div class="card bg-card-dark shadow-sm anim-card h-100">
                             
-                            <img src="{% static 'converted/' %}{{ image }}"
+                               <img src="{{ MEDIA_URL }}converted/{{ image }}"
                                  class="card-img-top img-fluid gallery-img"
                                  alt="{{ image }}">
 
