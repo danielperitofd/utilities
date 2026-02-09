@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Converter</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Upload Images to Convert to BMP</h1>
+        <form action="/" method="post" enctype="multipart/form-data">
+            <input type="file" name="file" multiple>
+            <input type="number" name="width" placeholder="Enter width (e.g., 200)" min="1" required>
+            <input type="number" name="height" placeholder="Enter height (e.g., 150)" min="1" required>
+            <button type="submit">Upload and Convert</button>
+        </form>
+        
+        <!-- Galeria de imagens -->
+        <div class="gallery">
+            {% if images %}
+                <h2>Converted Images</h2>
+            
+                <form action="/clear-images" method="post" style="margin: 0;">
+                    <button type="submit" style="background-color: red; color: white;">Limpar Fotos</button>
+                </form>
+                
+                <form action="/download-selected" method="post">
+                    <div class="image-list">
+                        {% for image in images %}
+                            <div class="image-item">
+                                <img src="{{ url_for('static', filename='converted/' + image) }}" alt="{{ image }}" class="converted-image">
+                                <label>
+                                    <input type="checkbox" name="selected_images" value="{{ image }}">
+                                    Select
+                                </label>
+                                <a href="{{ url_for('download_image', filename=image) }}" class="download-link">Download</a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <button type="submit">Download Selected</button>
+                </form>
+                <form action="/download-all" method="post">
+                    <button type="submit">Download All</button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

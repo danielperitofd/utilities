@@ -1,0 +1,39 @@
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+}
+
+.gallery {
+    margin-top: 20px;
+}
+
+.image-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.image-item {
+    margin: 10px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: center;
+}
+
+.converted-image {
+    max-width: 150px;
+    max-height: 150px;
+}
+
+.download-link {
+    display: block;
+    margin-top: 5px;
+    color: #007BFF;
+    text-decoration: none;
+}
+
+.download-link:hover {
+    text-decoration: underline;
+}

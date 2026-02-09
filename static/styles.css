@@ -1,0 +1,56 @@
+/* --- TEMA ESCURO PRINCIPAL --- */
+.dark-theme {
+    background: #0d1117;
+    color: #e6edf3;
+}
+
+/* --- CARDS ESCUROS --- */
+.bg-card-dark {
+    background: #161b22 !important;
+    border-radius: 15px;
+    border: 1px solid #2c323a;
+}
+
+/* --- IMAGENS DA GALERIA --- */
+.gallery-img {
+    max-height: 150px;
+    object-fit: contain;
+    padding: 10px;
+    background: #0d1117;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+/* --- ANIMAÇÃO DE ENTRADA --- */
+.fade-in {
+    animation: fadeIn 0.9s ease forwards;
+    opacity: 0;
+}
+@keyframes fadeIn {
+    to { opacity: 1; }
+}
+
+/* --- ANIMAÇÃO DOS CARDS --- */
+.anim-card {
+    transition: transform .25s ease, box-shadow .25s ease;
+}
+.anim-card:hover {
+    transform: translateY(-6px) scale(1.03);
+    box-shadow: 0 8px 26px rgba(0,0,0,0.5);
+    border-color: #3b82f6;
+}
+
+/* --- NAVBAR LINKS --- */
+.navbar-dark .nav-link {
+    color: #b9c2cf !important;
+}
+.navbar-dark .nav-link:hover {
+    color: #fff !important;
+    text-shadow: 0 0 6px #3b82f6;
+}
+
+/* Ajusta a cor do placeholder no tema escuro */
+::placeholder {
+    color: #8b98a5 !important; /* cinza mais visível */
+    opacity: 1; /* garante 100% opacidade */
+}
