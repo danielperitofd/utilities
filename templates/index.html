@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -12,7 +13,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <!-- Seu CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
 </head>
 
 <body class="dark-theme">
@@ -20,7 +21,7 @@
     <!-- 🔥 NAVBAR MODERNA -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-secondary shadow-sm">
         <div class="container">
-            <a class="navbar-brand fw-bold text-primary-emphasis text-light" href="#">
+            <a class="navbar-brand fw-bold text-primary-emphasis text-light" href="{% url 'index' %}">
                 <i class="fa-solid fa-wand-magic-sparkles me-2"></i>
                 Conversor BMP
             </a>
@@ -32,12 +33,12 @@
             <div class="collapse navbar-collapse" id="menu">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" href="#">
+                        <a class="nav-link active" href="{% url 'index' %}">
                             <i class="fa-solid fa-image me-2"></i>Converter
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
+                        <a class="nav-link" href="{% url 'index' %}#galeria">
                             <i class="fa-solid fa-folder-open me-2"></i>Galeria
                         </a>
                     </li>
@@ -55,7 +56,8 @@
                 Enviar e Converter Imagens
             </h2>
 
-            <form action="/" method="post" enctype="multipart/form-data" class="row g-3">
+            <form action="{% url 'index' %}" method="post" enctype="multipart/form-data" class="row g-3">
+                {% csrf_token %}
 
                 <div class="col-12">
                     <label class="form-label text-light">Selecione as Imagens</label>
@@ -68,6 +70,7 @@
                         name="width" 
                         class="form-control bg-dark text-light border-secondary" 
                         placeholder="Ex.: 160 px"
+                        value="200"
                         required>
                 </div>
 
@@ -77,6 +80,7 @@
                         name="height" 
                         class="form-control bg-dark text-light border-secondary" 
                         placeholder="Ex.: 160 px"
+                        value="150"
                         required>
                 </div>
 
@@ -90,22 +94,24 @@
 
         <!-- 🔽 GALERIA -->
         {% if images %}
-        <div class="mt-5 fade-in">
+        <div class="mt-5 fade-in" id="galeria">
 
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h3 class="text-light">
                     <i class="fa-solid fa-images me-2 text-info"></i>
-                    Imagens Convertidas
+                    Imagens Convertidas ({{ images|length }})
                 </h3>
 
-                <form action="/clear-images" method="post">
+                <form action="{% url 'clear_images' %}" method="post">
+                    {% csrf_token %}
                     <button class="btn btn-outline-danger btn-sm">
                         <i class="fa-solid fa-trash-can me-1"></i>Limpar Tudo
                     </button>
                 </form>
             </div>
 
-            <form action="/download-selected" method="post">
+            <form action="{% url 'download_selected' %}" method="post">
+                {% csrf_token %}
 
                 <div class="row g-4">
                     {% for image in images %}
@@ -114,8 +120,9 @@
                         <!-- CARD DA GALERIA COM ANIMAÇÃO -->
                         <div class="card bg-card-dark shadow-sm anim-card h-100">
                             
-                            <img src="{{ url_for('static', filename='converted/' + image) }}"
-                                 class="card-img-top img-fluid gallery-img">
+                            <img src="{% static 'converted/' %}{{ image }}"
+                                 class="card-img-top img-fluid gallery-img"
+                                 alt="{{ image }}">
 
                             <div class="card-body text-center">
 
@@ -124,7 +131,7 @@
                                        value="{{ image }}" 
                                        class="form-check-input mb-2">
 
-                                <a href="{{ url_for('download_image', filename=image) }}"
+                                <a href="{% url 'download_image' image %}"
                                    class="btn btn-outline-info btn-sm w-100 mt-2">
                                     <i class="fa-solid fa-download me-1"></i>
                                     Baixar
@@ -143,13 +150,19 @@
                 </button>
             </form>
 
-            <form action="/download-all" method="post">
+            <form action="{% url 'download_all' %}" method="post">
+                {% csrf_token %}
                 <button class="btn btn-secondary w-100 mt-3 fw-bold">
                     <i class="fa-solid fa-box-archive me-2"></i>
                     Baixar Todas
                 </button>
             </form>
 
+        </div>
+        {% else %}
+        <div class="alert alert-info mt-5 text-center">
+            <i class="fa-solid fa-info-circle me-2"></i>
+            Nenhuma imagem convertida ainda. Comece enviando algumas imagens!
         </div>
         {% endif %}
     </div>
