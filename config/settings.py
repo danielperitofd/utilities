@@ -23,6 +23,28 @@ INSTALLED_APPS = [
     'converter',
 ]
 
+# Em config/settings.py, descomente e configure:
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'bmpconverter',
+        'USER': 'postgres',
+        'PASSWORD': 'sua_senha',  # Altere!
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
+}
+
+# Install: pip install psycopg2-binary
+# 
+# Or use SQLite for development:
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -48,14 +70,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
-
-# Database
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
