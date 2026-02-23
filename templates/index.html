@@ -100,6 +100,20 @@
                 Renomear Imagens
             </h2>
             
+            <!-- Compartilhamento multi-dispositivo -->
+            <div class="alert alert-info mb-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="fa-solid fa-share-nodes me-2"></i>
+                        <strong>Acessar em outro dispositivo:</strong>
+                        <code class="text-dark" id="shareCode">{{ share_link }}</code>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-info" onclick="copyShareLink()">
+                        <i class="fa-solid fa-copy me-1"></i>Copiar Link
+                    </button>
+                </div>
+            </div>
+            
             <p class="text-light text-center mb-4">
                 Dê um nome personalizado para cada imagem abaixo. Se deixar em branco, usará o nome original.
             </p>
@@ -108,6 +122,7 @@
                 {% csrf_token %}
                 <input type="hidden" name="width" value="{{ width }}">
                 <input type="hidden" name="height" value="{{ height }}">
+                {% if session_id %}<input type="hidden" name="session_id" value="{{ session_id }}">{% endif %}
 
                 <div class="row g-3">
                     {% for file in uploaded_files %}
@@ -152,6 +167,17 @@
         </div>
 
         <script>
+            // Copy share link to clipboard
+            function copyShareLink() {
+                const shareCode = document.getElementById('shareCode').textContent;
+                const fullUrl = window.location.origin + '/' + shareCode;
+                navigator.clipboard.writeText(fullUrl).then(() => {
+                    alert('Link copiado! Você pode abrir em outro dispositivo.');
+                }).catch(() => {
+                    alert('Erro ao copiar. Copie manualmente: ' + fullUrl);
+                });
+            }
+            
             // Update preview name as user types
             document.querySelectorAll('.custom-name-input').forEach(input => {
                 input.addEventListener('input', function() {

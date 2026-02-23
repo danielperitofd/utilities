@@ -17,10 +17,17 @@ from .models import ImageUpload, ConvertedImage
 @require_http_methods(["GET", "POST"])
 def index(request):
     """Handle image upload and conversion."""
+    # Check if session is passed as parameter (for cross-device access)
+    param_session_id = request.GET.get('session')
+    
     session_id = request.session.get('session_id')
     if not session_id:
         session_id = str(uuid.uuid4())
         request.session['session_id'] = session_id
+    
+    # If a session parameter is provided, use it instead
+    if param_session_id:
+        session_id = param_session_id
     
     if request.method == 'POST':
         # Check if it's a rename submission (has custom_names)
@@ -34,15 +41,44 @@ def index(request):
         original_upload__session_id=session_id
     ).order_by('-created_at')
     
+    # Check if there are images being renamed
+    pending_uploads = ImageUpload.objects.filter(
+        session_id=session_id,
+        converted=False
+    )
+    
     context = {
         'converted_images': converted_images,
         'show_rename_form': False,
+        'session_id': session_id,
+        'share_link': f"?session={session_id}",
     }
+    
+    # If there are pending uploads, show them
+    if pending_uploads.exists():
+        context['show_rename_form'] = True
+        context['uploaded_files'] = [
+            {
+                'id': img.id,
+                'original_name': img.original_filename,
+                'name_without_ext': img.custom_name,
+                'preview_base64': img.image_preview_base64,
+            }
+            for img in pending_uploads
+        ]
+        context['width'] = pending_uploads.first().width
+        context['height'] = pending_uploads.first().height
+    
     return render(request, 'index.html', context)
 
 
 def handle_upload(request, session_id):
     """Handle image upload and prepare for renaming."""
+    # Check if session_id is overridden in POST
+    post_session_id = request.POST.get('session_id')
+    if post_session_id:
+        session_id = post_session_id
+    
     files = request.FILES.getlist('file')
     width = int(request.POST.get('width', 200))
     height = int(request.POST.get('height', 150))
@@ -99,12 +135,19 @@ def handle_upload(request, session_id):
         'height': height,
         'converted_images': [],
         'show_rename_form': True,
+        'session_id': session_id,
+        'share_link': f"?session={session_id}",
     }
     return render(request, 'index.html', context)
 
 
 def handle_conversion_with_names(request, session_id):
     """Convert images with custom names."""
+    # Check if session_id is overridden in POST
+    post_session_id = request.POST.get('session_id')
+    if post_session_id:
+        session_id = post_session_id
+    
     width = int(request.POST.get('width', 200))
     height = int(request.POST.get('height', 150))
     
