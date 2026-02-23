@@ -164,6 +164,14 @@ def handle_conversion_with_names(request, session_id):
 
 
 @require_http_methods(["GET"])
+def view_image(request, image_id):
+    """View a converted image as base64."""
+    converted_image = get_object_or_404(ConvertedImage, id=image_id)
+    image_base64 = base64.b64encode(converted_image.bmp_image).decode()
+    return HttpResponse(f'data:image/bmp;base64,{image_base64}')
+
+
+@require_http_methods(["GET"])
 def download_image(request, image_id):
     """Download a single converted image."""
     converted_image = get_object_or_404(ConvertedImage, id=image_id)

@@ -9,6 +9,7 @@ from converter import views
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('view-image/<int:image_id>/', views.view_image, name='view_image'),
     path('download-image/<int:image_id>/', views.download_image, name='download_image'),
     path('download-selected/', views.download_selected, name='download_selected'),
     path('download-all/', views.download_all, name='download_all'),

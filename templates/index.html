@@ -183,13 +183,13 @@
         {% endif %}
 
         <!-- 🔽 GALERIA -->
-        {% if images %}
+        {% if converted_images %}
         <div class="mt-5 fade-in" id="galeria">
 
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h3 class="text-light">
                     <i class="fa-solid fa-images me-2 text-info"></i>
-                    Imagens Convertidas ({{ images|length }})
+                    Imagens Convertidas ({{ converted_images|length }})
                 </h3>
 
                 <form action="{% url 'clear_images' %}" method="post">
@@ -204,24 +204,25 @@
                 {% csrf_token %}
 
                 <div class="row g-4">
-                    {% for image in images %}
+                    {% for image in converted_images %}
                     <div class="col-md-3 col-sm-4 col-6">
 
                         <!-- CARD DA GALERIA COM ANIMAÇÃO -->
                         <div class="card bg-card-dark shadow-sm anim-card h-100">
                             
-                            <img src="{% static 'converted/' %}{{ image }}"
+                            <img src="{% url 'view_image' image.id %}"
                                  class="card-img-top img-fluid gallery-img"
-                                 alt="{{ image }}">
+                                 alt="{{ image.filename }}">
 
                             <div class="card-body text-center">
+                                <small class="text-muted d-block mb-2">{{ image.filename }}</small>
 
                                 <input type="checkbox" 
                                        name="selected_images" 
-                                       value="{{ image }}" 
+                                       value="{{ image.id }}" 
                                        class="form-check-input mb-2">
 
-                                <a href="{% url 'download_image' image %}"
+                                <a href="{% url 'download_image' image.id %}"
                                    class="btn btn-outline-info btn-sm w-100 mt-2">
                                     <i class="fa-solid fa-download me-1"></i>
                                     Baixar
