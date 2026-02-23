@@ -108,18 +108,29 @@
                 {% csrf_token %}
                 <input type="hidden" name="width" value="{{ width }}">
                 <input type="hidden" name="height" value="{{ height }}">
-                <input type="hidden" name="custom_names" value="">
 
                 <div class="row g-3">
                     {% for file in uploaded_files %}
                     <div class="col-md-6">
                         <div class="card bg-secondary bg-opacity-10 p-3">
+                            <!-- Preview Image -->
+                            {% if file.preview_base64 %}
+                            <img src="data:image/png;base64,{{ file.preview_base64 }}" 
+                                 class="img-fluid rounded mb-3" 
+                                 alt="{{ file.original_name }}"
+                                 style="max-height: 150px; object-fit: contain;">
+                            {% endif %}
+
                             <label class="form-label text-light fw-bold">
                                 <i class="fa-solid fa-image me-2 text-info"></i>
                                 {{ file.original_name }}
                             </label>
+                            
+                            <input type="hidden" name="image_ids" value="{{ file.id }}">
+                            
                             <input type="text" 
                                    class="form-control bg-dark text-light border-secondary custom-name-input" 
+                                   name="custom_names"
                                    placeholder="Digite um novo nome (sem extensão)"
                                    value="{{ file.name_without_ext }}"
                                    data-original="{{ file.original_name }}">
@@ -146,37 +157,6 @@
                 input.addEventListener('input', function() {
                     const preview = this.parentElement.querySelector('.preview-name');
                     preview.textContent = this.value || this.getAttribute('data-original').split('.')[0];
-                });
-            });
-
-            // Before form submission, collect all custom names
-            document.querySelector('form').addEventListener('submit', function(e) {
-                const customNames = [];
-                const originalNames = [];
-                
-                document.querySelectorAll('.custom-name-input').forEach(input => {
-                    customNames.push(input.value);
-                    originalNames.push(input.getAttribute('data-original'));
-                });
-                
-                // Create hidden inputs dynamically
-                const namesField = document.querySelector('input[name="custom_names"]');
-                namesField.name = 'original_names';
-                
-                customNames.forEach(name => {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = 'custom_names';
-                    input.value = name;
-                    this.appendChild(input);
-                });
-                
-                originalNames.forEach(name => {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = 'original_names';
-                    input.value = name;
-                    this.appendChild(input);
                 });
             });
         </script>
