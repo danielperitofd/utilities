@@ -28,8 +28,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'bmpconverter',
-        'USER': 'postgres',
-        'PASSWORD': 'sua_senha',  # Altere!
+        'USER': 'bmpuser',
+        'PASSWORD': 'sua_senha_super_segura',
         'HOST': 'localhost',
         'PORT': '5432',
     }
