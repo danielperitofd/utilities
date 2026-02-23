@@ -86,11 +86,101 @@
 
                 <div class="col-12 mt-3">
                     <button type="submit" class="btn btn-info w-100 py-2 fw-bold">
-                        <i class="fa-solid fa-gears me-2"></i>Converter Agora
+                        <i class="fa-solid fa-gears me-2"></i>Enviar para Renomear
                     </button>
                 </div>
             </form>
         </div>
+
+        <!-- 🔷 RENAMING PANEL -->
+        {% if show_rename_form and uploaded_files %}
+        <div class="card shadow-lg bg-card-dark p-4 mx-auto fade-in mt-5" style="max-width: 900px;">
+            <h2 class="text-center mb-4 text-light fw-bold">
+                <i class="fa-solid fa-pen-to-square me-2 text-warning"></i>
+                Renomear Imagens
+            </h2>
+            
+            <p class="text-light text-center mb-4">
+                Dê um nome personalizado para cada imagem abaixo. Se deixar em branco, usará o nome original.
+            </p>
+
+            <form action="{% url 'index' %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="width" value="{{ width }}">
+                <input type="hidden" name="height" value="{{ height }}">
+                <input type="hidden" name="custom_names" value="">
+
+                <div class="row g-3">
+                    {% for file in uploaded_files %}
+                    <div class="col-md-6">
+                        <div class="card bg-secondary bg-opacity-10 p-3">
+                            <label class="form-label text-light fw-bold">
+                                <i class="fa-solid fa-image me-2 text-info"></i>
+                                {{ file.original_name }}
+                            </label>
+                            <input type="text" 
+                                   class="form-control bg-dark text-light border-secondary custom-name-input" 
+                                   placeholder="Digite um novo nome (sem extensão)"
+                                   value="{{ file.name_without_ext }}"
+                                   data-original="{{ file.original_name }}">
+                            <small class="text-muted d-block mt-2">Será salvo como: <span class="text-info preview-name">{{ file.name_without_ext }}</span>.bmp</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-success w-100 py-2 fw-bold">
+                        <i class="fa-solid fa-check me-2"></i>Converter com Esses Nomes
+                    </button>
+                    <a href="{% url 'index' %}" class="btn btn-secondary w-100 mt-2 py-2 fw-bold">
+                        <i class="fa-solid fa-arrow-left me-2"></i>Voltar
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <script>
+            // Update preview name as user types
+            document.querySelectorAll('.custom-name-input').forEach(input => {
+                input.addEventListener('input', function() {
+                    const preview = this.parentElement.querySelector('.preview-name');
+                    preview.textContent = this.value || this.getAttribute('data-original').split('.')[0];
+                });
+            });
+
+            // Before form submission, collect all custom names
+            document.querySelector('form').addEventListener('submit', function(e) {
+                const customNames = [];
+                const originalNames = [];
+                
+                document.querySelectorAll('.custom-name-input').forEach(input => {
+                    customNames.push(input.value);
+                    originalNames.push(input.getAttribute('data-original'));
+                });
+                
+                // Create hidden inputs dynamically
+                const namesField = document.querySelector('input[name="custom_names"]');
+                namesField.name = 'original_names';
+                
+                customNames.forEach(name => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'custom_names';
+                    input.value = name;
+                    this.appendChild(input);
+                });
+                
+                originalNames.forEach(name => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'original_names';
+                    input.value = name;
+                    this.appendChild(input);
+                });
+            });
+        </script>
+        {% endif %}
 
         <!-- 🔽 GALERIA -->
         {% if images %}
@@ -120,7 +210,7 @@
                         <!-- CARD DA GALERIA COM ANIMAÇÃO -->
                         <div class="card bg-card-dark shadow-sm anim-card h-100">
                             
-                               <img src="{{ MEDIA_URL }}converted/{{ image }}"
+                            <img src="{% static 'converted/' %}{{ image }}"
                                  class="card-img-top img-fluid gallery-img"
                                  alt="{{ image }}">
 

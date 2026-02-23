@@ -23,29 +23,11 @@ os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 def index(request):
     """Handle image upload and conversion."""
     if request.method == 'POST':
-        files = request.FILES.getlist('file')
-        width = int(request.POST.get('width', 200))
-        height = int(request.POST.get('height', 150))
-        
-        if not files:
-            return HttpResponse("No files uploaded", status=400)
-        
-        for file in files:
-            if file.name == '':
-                continue
-            
-            # Save uploaded file
-            filepath = UPLOAD_FOLDER / file.name
-            with open(filepath, 'wb+') as f:
-                for chunk in file.chunks():
-                    f.write(chunk)
-            
-            # Convert to BMP
-            img = Image.open(filepath)
-            img = img.resize((width, height), Image.Resampling.LANCZOS)
-            bmp_filename = os.path.splitext(file.name)[0] + '.bmp'
-            bmp_filepath = OUTPUT_FOLDER / bmp_filename
-            img.save(bmp_filepath)
+        # Check if it's a rename submission (has custom_names)
+        if 'custom_names' in request.POST:
+            return handle_conversion_with_names(request)
+        else:
+            return handle_upload(request)
     
     # Load converted images for gallery
     images = []
@@ -54,6 +36,87 @@ def index(request):
     
     context = {
         'images': images,
+    }
+    return render(request, 'index.html', context)
+
+
+def handle_upload(request):
+    """Handle image upload and prepare for renaming."""
+    files = request.FILES.getlist('file')
+    width = int(request.POST.get('width', 200))
+    height = int(request.POST.get('height', 150))
+    
+    if not files:
+        return HttpResponse("No files uploaded", status=400)
+    
+    # Save uploaded files temporarily
+    uploaded_files = []
+    for file in files:
+        if file.name == '':
+            continue
+        
+        filepath = UPLOAD_FOLDER / file.name
+        with open(filepath, 'wb+') as f:
+            for chunk in file.chunks():
+                f.write(chunk)
+        
+        uploaded_files.append({
+            'original_name': file.name,
+            'name_without_ext': os.path.splitext(file.name)[0],
+        })
+    
+    context = {
+        'uploaded_files': uploaded_files,
+        'width': width,
+        'height': height,
+        'images': [],
+        'show_rename_form': True,
+    }
+    return render(request, 'index.html', context)
+
+
+def handle_conversion_with_names(request):
+    """Convert images with custom names."""
+    width = int(request.POST.get('width', 200))
+    height = int(request.POST.get('height', 150))
+    
+    # Get all files in upload folder and their custom names
+    custom_names = request.POST.getlist('custom_names')
+    original_names = request.POST.getlist('original_names')
+    
+    # Process conversions
+    for original_name, custom_name in zip(original_names, custom_names):
+        original_name = original_name.strip()
+        custom_name = custom_name.strip()
+        
+        if not original_name:
+            continue
+        
+        filepath = UPLOAD_FOLDER / original_name
+        if not filepath.exists():
+            continue
+        
+        try:
+            img = Image.open(filepath)
+            img = img.resize((width, height), Image.Resampling.LANCZOS)
+            
+            # Use custom name, or original if empty
+            final_name = custom_name if custom_name else os.path.splitext(original_name)[0]
+            bmp_filename = final_name + '.bmp'
+            bmp_filepath = OUTPUT_FOLDER / bmp_filename
+            
+            img.save(bmp_filepath)
+        except Exception as e:
+            print(f"Error converting {original_name}: {str(e)}")
+    
+    # Load converted images for gallery
+    images = []
+    if os.path.exists(OUTPUT_FOLDER):
+        images = sorted(os.listdir(OUTPUT_FOLDER))
+    
+    context = {
+        'images': images,
+        'show_rename_form': False,
     }
     return render(request, 'index.html', context)
 
